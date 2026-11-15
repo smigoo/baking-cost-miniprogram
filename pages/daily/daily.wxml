@@ -1,0 +1,71 @@
+<!-- pages/daily/daily.wxml -->
+<view class="screen">
+  <view class="title">记销量</view>
+  <view class="sub">选日期录入当天各商品销量；可提前填未来日期作预估，实际有变动再改</view>
+
+  <!-- 日历（选天） -->
+  <view class="card">
+    <view class="cal-head">
+      <view class="mbtn" bindtap="prevMonth">‹</view>
+      <view class="m">{{calMonthLabel}}</view>
+      <view class="mbtn" bindtap="nextMonth">›</view>
+    </view>
+    <view class="cal-week"><text>日</text><text>一</text><text>二</text><text>三</text><text>四</text><text>五</text><text>六</text></view>
+    <view class="cal-grid">
+      <view wx:for="{{calCells}}" wx:key="idx"
+            class="cal-cell {{item.empty?'empty':''}} {{item.isToday?'today':''}} {{item.sel?'sel':''}}"
+            data-date="{{item.date}}" bindtap="onTapCell">
+        <text wx:if="{{!item.empty}}">{{item.day}}</text>
+        <view wx:if="{{!item.empty && item.has}}" class="dots"><view class="a"></view></view>
+      </view>
+    </view>
+    <view style="text-align:right;margin-top:8px"><text class="kind-tag" bindtap="backToday">回到今天</text></view>
+  </view>
+
+  <!-- 当日收支 -->
+  <view class="card">
+    <view class="card-h2">{{dayLabel}} 收支</view>
+    <view class="board">
+      <view class="b"><view class="k">收入</view><view class="v" style="color:var(--caramel)">{{day.rev}}</view></view>
+      <view class="b"><view class="k">成本</view><view class="v" style="color:var(--brick)">{{day.cost}}</view></view>
+      <view class="b"><view class="k">毛利</view><view class="v" style="color:var(--olive)">{{day.profit}}</view></view>
+    </view>
+    <view class="donut-row" style="margin-top:6px">
+      <view class="ring" style="background: conic-gradient({{day.ringColor}} {{day.marginDeg}}deg, var(--cream) 0);">
+        <view class="ring-inner"><text class="big">{{day.marginText}}</text><text class="lbl">毛利率</text></view>
+      </view>
+      <view class="legend">
+        <view class="legend-row"><view class="legend-left"><view class="dot" style="background:var(--caramel)"></view>毛利</view><view class="val">{{day.profit}}</view></view>
+        <view class="legend-row"><view class="legend-left"><view class="dot" style="background:var(--caramel)"></view>成本</view><view class="val">{{day.cost}}</view></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 商品销量录入 -->
+  <view class="card">
+    <view class="card-h2">商品销量 <view class="add2" bindtap="togglePicker">+ 添加商品</view></view>
+    <view class="sub" style="margin-bottom:8px">从「商品库」选择要记录的商品；这里的改动只影响当天销量，不改动商品库</view>
+
+    <view wx:if="{{pickerOpen}}" class="day-picker">
+      <view class="row" style="align-items:center">
+        <picker class="sel" range="{{pickerOptions}}" range-key="label" value="{{pickerIndex}}" bindchange="onPickerChange" disabled="{{pickerOptions.length===0}}" style="flex:1">
+          <view class="picker-text">{{pickerText}}</view>
+        </picker>
+        <view class="add {{pickerOptions.length===0?'add-disabled':''}}" bindtap="confirmAdd">添加</view>
+      </view>
+      <view class="sub" style="margin-top:6px">{{pickerHint}}</view>
+    </view>
+
+    <view wx:if="{{dayList.length===0}}" class="sub">今天还没记录销量，点右上「+ 添加商品」从商品库选择。</view>
+    <view wx:for="{{dayList}}" wx:key="gid" class="row row-good">
+      <view class="name">{{item.name}}</view>
+      <view class="stepper">
+        <view class="step-btn" data-gid="{{item.gid}}" bindtap="onQtyMinus">−</view>
+        <input class="step-num" type="digit" value="{{item.qty}}" data-gid="{{item.gid}}" bindinput="onQtyInput"/>
+        <view class="step-btn" data-gid="{{item.gid}}" bindtap="onQtyPlus">+</view>
+      </view>
+      <view class="del" data-gid="{{item.gid}}" bindtap="onRemove">✕</view>
+    </view>
+  </view>
+
+</view>

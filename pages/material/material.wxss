@@ -1,0 +1,54 @@
+/* pages/material/material.wxss —— 黄黑 · 卡片化行布局 */
+
+/* 单条原料块：与原先「一行塞 6 个元素」相比，拆成 名称区 / 三列输入 / 结果行 三区 */
+.mrow { padding: 14px 0; border-top: 1px solid var(--line); }
+.mrow:first-of-type { border-top: none; padding-top: 2px; }
+
+/* 区 1：名称（放大加粗，像标题）+ 删除 */
+.mrow-top { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.mname {
+  flex: 1; border: none; background: transparent;
+  font-size: 16px; font-weight: 600; color: var(--brown); outline: none; padding: 2px 0; line-height: 1.3;
+}
+.mname:focus { border-bottom: 1px solid var(--caramel); }
+/* 删除按钮：加大点按热区，避免点不到/误触 */
+.mrow-top .del { font-size: 18px; padding: 6rpx 12rpx; min-width: 44rpx; text-align: center; border-radius: 8px; }
+.mrow-top .del:active { color: var(--brick); background: rgba(207,106,79,.12); }
+
+/* 区 2：三列等宽输入（进价 / 重量 / 单位） */
+.mrow-fields { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.mfield { display: flex; flex-direction: column; gap: 5px; }
+.mlbl { font-size: 11px; color: var(--brown-2); }
+.minput {
+  width: 100%; box-sizing: border-box;
+  border: 1px solid var(--line); border-radius: 8px;
+  height: 42px; line-height: 42px; padding: 0 10px;
+  text-align: left; font-size: 14px;
+  background: var(--surface); color: var(--brown); outline: none;
+}
+.minput:focus { border-color: var(--caramel); }
+/* 单位 picker 复用 .mfield 列布局，值展示与输入框同款卡片，视觉统一 */
+.munit-val {
+  width: 100%; box-sizing: border-box;
+  border: 1px solid var(--line); border-radius: 8px;
+  height: 42px; line-height: 42px; padding: 0 10px;
+  font-size: 14px; overflow: hidden; white-space: nowrap;
+  background: var(--surface); color: var(--brown);
+}
+
+/* 区 3：结果行（重量换算 + 每克单价），虚线分隔，只读 */
+.mrow-calc {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line);
+}
+.calc-line { display: flex; align-items: baseline; gap: 8px; }
+.ckey { font-size: 12px; color: var(--brown-2); white-space: nowrap; }
+.cval { font-size: 15px; font-weight: 700; color: var(--caramel); }
+.calc-note { font-size: 11px; color: var(--brown-2); }
+
+/* 空状态：原料库为空时明确告知「配方依赖这里」，避免用户以为是 bug */
+.mat-empty { padding: 26px 20px 18px; text-align: center; }
+.me-mark { width: 34px; height: 34px; margin: 0 auto 12px; border: 3px solid var(--caramel); border-radius: 10px; position: relative; opacity: .6; }
+.me-mark::after { content: ''; position: absolute; width: 16px; height: 3px; background: var(--caramel); left: 50%; top: 50%; transform: translate(-50%, -50%); border-radius: 2px; }
+.me-title { font-size: 15px; font-weight: 700; color: var(--brown); margin-bottom: 6px; }
+.me-sub { font-size: 12px; color: var(--brown-2); line-height: 1.6; }

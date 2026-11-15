@@ -1,0 +1,38 @@
+<!-- pages/material/material.wxml -->
+<view class="screen">
+  <view class="title">原料</view>
+  <view class="sub">填写进价与重量，可切换质量/体积单位（克·千克·斤·两·磅·盎司 / 毫升·升·茶匙·汤匙·量杯），自动换算成克并算每克单价；体积换算为近似估算并标注</view>
+  <view class="card">
+    <view wx:for="{{materials}}" wx:key="id" class="mrow">
+      <view class="mrow-top">
+        <input class="mname" value="{{item.name}}" data-id="{{item.id}}" data-k="name" bindinput="onInput" placeholder="原料名称"/>
+        <view class="del" data-id="{{item.id}}" bindtap="onDel">✕</view>
+      </view>
+      <view class="mrow-fields">
+        <view class="mfield">
+          <text class="mlbl">进价(元)</text>
+          <input class="minput" type="digit" value="{{item.price}}" data-id="{{item.id}}" data-k="price" bindinput="onInput"/>
+        </view>
+        <view class="mfield">
+          <text class="mlbl">重量</text>
+          <input class="minput" type="digit" value="{{item.amount}}" data-id="{{item.id}}" data-k="amount" bindinput="onInput"/>
+        </view>
+        <picker class="mfield" range="{{item.unitOpts}}" range-key="label" value="{{item.unitIdx||0}}" data-id="{{item.id}}" bindchange="onUnitChange">
+          <text class="mlbl">单位</text>
+          <view class="munit-val">{{item.unitLabel}} ▾</view>
+        </picker>
+      </view>
+      <view class="mrow-calc">
+        <view class="calc-line"><text class="ckey">重量换算</text><text class="cval">{{item.amount}}{{item.unitLabel}} → {{item.gramsText}} g</text></view>
+        <view class="calc-line"><text class="ckey">每克单价</text><text class="cval">{{item.unitPriceText}}</text></view>
+        <view wx:if="{{item.unitNote}}" class="calc-note">{{item.unitNote}}</view>
+      </view>
+    </view>
+    <view wx:if="{{materials.length===0}}" class="mat-empty">
+      <view class="me-mark"></view>
+      <view class="me-title">原料库是空的</view>
+      <view class="me-sub">商品的配方只能从这里选原料。先点下方「+ 添加原料」，填好进价与重量，再回商品页配配方</view>
+    </view>
+    <view class="add add-full" bindtap="onAdd">+ 添加原料</view>
+  </view>
+</view>

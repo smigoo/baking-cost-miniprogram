@@ -1,0 +1,182 @@
+/* app.wxss —— 全局样式（协调烘焙暖色：奶油米底 + 焦糖橙强调 + 橄榄绿=盈利 + 砖红=成本/预警） */
+page {
+  --cream: #FBF4EC;        /* 奶油米底（页面背景 / 次级表面） */
+  --card: #FFFFFF;         /* 卡片表面 */
+  --surface: #FFFFFF;      /* 输入框 / 浮层表面 */
+  --caramel: #DE8A4E;      /* 主强调（焦糖橙：按钮 / 选中 / 进度） */
+  --honey: #F2B75E;        /* 浅一档橙（按下态 / 高亮数字） */
+  --olive: #8BAE6B;        /* 正向 / 盈利（橄榄绿） */
+  --brick: #CF6A4F;        /* 负向 / 成本 / 预警（砖红，唯一语义红） */
+  --brown: #4A3B2E;        /* 主文字（深棕） */
+  --brown-2: #8C7A6B;      /* 次级文字 */
+  --line: #F0E4D6;         /* 分隔线（浅暖） */
+
+  background: var(--cream);
+  color: var(--brown);
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 14px;
+}
+
+/* 系统深色模式：跟随手机「显示与亮度」自动切换（暖色在暗色下降饱和更柔和） */
+@media (prefers-color-scheme: dark) {
+  page {
+    --cream: #211A14;
+    --card: #2C241C;
+    --surface: #3A3128;
+    --caramel: #E89A5A;
+    --honey: #D9A05B;
+    --olive: #9EC27F;
+    --brick: #E07A5F;
+    --brown: #EDE3D6;
+    --brown-2: #B7A994;
+    --line: #3A3128;
+  }
+}
+
+.screen { padding: 16px 16px 24px; }
+
+.title { font-size: 18px; font-weight: 600; margin-bottom: 2px; }
+.sub { font-size: 12px; color: var(--brown-2); margin-bottom: 14px; }
+
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 4px 16px rgba(74,59,46,.07);
+  margin-bottom: 14px;
+}
+.card-h2 { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+
+/* 净利润 hero：深可可棕底 + 奶油字 + 蜂蜜橙数字（深浅模式都协调、有分量感） */
+.banner {
+  background: #3A2F25;
+  border-radius: 18px;
+  padding: 20px 18px;
+  color: #FBF4EC;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 22px rgba(58,47,37,.22);
+}
+.banner .lbl { font-size: 12px; color: rgba(251,244,236,.72); }
+.banner .big { font-size: 34px; font-weight: 700; margin: 4px 0; color: var(--honey); }
+.banner .badge { display: inline-block; font-size: 12px; background: rgba(242,183,94,.20); color: var(--honey); padding: 3px 10px; border-radius: 20px; }
+
+/* 行布局 */
+.row { display: flex; align-items: center; gap: 8px; padding: 9px 0; border-top: 1px solid var(--line); }
+.row:first-of-type { border-top: none; }
+.name { flex: 1.4; }
+.name-input { width: 100%; border: none; background: transparent; font-size: 14px; color: var(--brown); outline: none; font-weight: 600; }
+.name-input:focus { border-bottom: 1px solid var(--caramel); }
+
+.field-mini { flex: 1; text-align: right; }
+.field-mini .lbl { display: block; font-size: 10px; color: var(--brown-2); }
+.num-input {
+  width: 64rpx; border: 1px solid var(--line); border-radius: 6px;
+  padding: 4px; text-align: right; font-size: 12px; outline: none;
+  background: var(--surface); color: var(--brown);
+  transition: border-color .15s;
+}
+.num-input:focus { border-color: var(--caramel); }
+.num-input-wide { width: 80rpx; }
+.sel { border: 1px solid var(--line); border-radius: 6px; padding: 4px; font-size: 12px; background: var(--surface); color: var(--brown); outline: none; transition: border-color .15s; }
+.sel:focus { border-color: var(--caramel); }
+.unit-sel { border: 1px solid var(--line); border-radius: 6px; padding: 4px 2px; font-size: 12px; background: var(--surface); color: var(--brown); outline: none; transition: border-color .15s; }
+.unit-sel:focus { border-color: var(--caramel); }
+
+.calc { font-size: 12px; color: var(--brown-2); flex: 1; text-align: right; }
+.calc b { color: var(--olive); }
+
+.del { color: var(--brown-2); font-size: 14px; padding: 0 6rpx; }
+.del:active { color: var(--brick); }
+/* 主操作：焦糖橙底白字胶囊按钮 */
+.add { display: inline-block; background: var(--caramel); color: #fff; font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 999px; margin-top: 8px; }
+.add:active { background: var(--honey); }
+.add-full { display: block; width: 100%; text-align: center; box-sizing: border-box; }
+
+/* 分段控件 */
+.seg { display: flex; background: var(--cream); border-radius: 12px; padding: 4px; gap: 4px; margin-bottom: 12px; }
+.seg-btn { flex: 1; border: none; background: none; padding: 8px; border-radius: 8px; font-size: 13px; color: var(--brown-2); }
+.seg-btn.active { background: var(--caramel); color: #fff; font-weight: 700; box-shadow: 0 2px 6px rgba(222,138,78,.22); }
+
+/* 收银台小卡 */
+.board { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.board .b { background: var(--cream); border-radius: 12px; padding: 10px 6px; text-align: center; }
+.board .b .k { font-size: 10px; color: var(--brown-2); }
+.board .b .v { font-size: 15px; font-weight: 700; margin-top: 3px; }
+
+/* 统计网格 */
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat { background: var(--cream); border-radius: 12px; padding: 12px; }
+.stat .k { font-size: 11px; color: var(--brown-2); }
+.stat .v { font-size: 18px; font-weight: 700; margin-top: 2px; }
+.stat.profit .v { color: var(--olive); }
+.stat.loss .v { color: var(--brick); }
+
+/* 商品排行（精简：一行工具栏 + 排名/名称/数值 + 条在下） */
+.rank-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.rank-period { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.rp { color: var(--brown-2); padding: 2px 1px; }
+.rp.on { color: var(--brown); font-weight: 700; border-bottom: 2px solid var(--caramel); }
+.rp-sep { color: var(--line); }
+.rank-metric { display: flex; gap: 6px; }
+.rm { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: var(--cream); color: var(--brown-2); }
+.rm.on { background: var(--caramel); color: #fff; font-weight: 700; }
+.rank-sub { font-size: 11px; color: var(--brown-2); margin-bottom: 8px; }
+.rank-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; }
+.rk { width: 20px; text-align: center; font-size: 13px; font-weight: 700; color: var(--brown-2); flex-shrink: 0; }
+.rbody { flex: 1; min-width: 0; }
+.rtop { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
+.rname { font-size: 13px; color: var(--brown); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.rval { font-size: 13px; font-weight: 700; flex-shrink: 0; }
+.rbar { height: 8px; background: var(--cream); border-radius: 4px; overflow: hidden; }
+.rfill { height: 100%; border-radius: 4px; min-width: 4%; }
+.rank-more { text-align: center; color: var(--caramel); font-size: 13px; font-weight: 600; padding: 8px 0; }
+
+/* 图例 / 毛利健康 */
+.donut-row { display: flex; align-items: center; gap: 14px; }
+.legend { flex: 1; font-size: 13px; }
+.legend-row { display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid var(--line); }
+.legend-row:first-child { border-top: none; }
+.legend-left { display: flex; align-items: center; gap: 7px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; }
+.val { font-weight: 600; }
+
+/* 商品手风琴 */
+.good-head { display: flex; align-items: center; gap: 8px; }
+.good.collapsed .good-body { display: none; }
+.good-head .chev { font-size: 14px; color: var(--brown-2); transition: transform .25s; flex-shrink: 0; }
+.good.collapsed .chev { transform: rotate(-90deg); }
+.good-body { margin-top: 10px; overflow: hidden; }
+.recipe { background: var(--cream); border-radius: 10px; padding: 6px 10px; margin: 6px 0 0; }
+.recipe .row { padding: 5px 0; border-top: none; }
+
+/* 预警下钻 */
+.warn-row { border-radius: 8px; padding: 2px 4px; margin: 0 -4px; }
+.warn-row:active { background: rgba(207,106,79,.10); }
+.warn-item { padding: 7px 8px; font-size: 13px; color: var(--brick); border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 8px; }
+.warn-item:active { background: rgba(207,106,79,.10); }
+.warn-item .wfix { color: var(--brown-2); font-size: 12px; white-space: nowrap; }
+
+/* 日历 */
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.cal-head .m { font-size: 14px; font-weight: 600; }
+.cal-head .mbtn { width: 60rpx; height: 60rpx; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--caramel); font-size: 16px; line-height: 60rpx; text-align: center; }
+.cal-week { display: grid; grid-template-columns: repeat(7,1fr); font-size: 10px; color: var(--brown-2); text-align: center; padding-bottom: 6px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+.cal-cell {
+  aspect-ratio: 1 / 1; border-radius: 9px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; font-size: 12px; color: var(--brown);
+  background: var(--cream); position: relative;
+}
+.cal-cell.empty { background: transparent; }
+.cal-cell.today { box-shadow: inset 0 0 0 3rpx var(--honey); }
+.cal-cell.sel { background: var(--caramel); color: #fff; font-weight: 700; }
+.cal-cell .dots { display: flex; gap: 2px; margin-top: 3px; height: 5px; align-items: center; }
+.cal-cell .dots .a { width: 8rpx; height: 8rpx; border-radius: 50%; background: var(--caramel); }
+.cal-cell.sel .dots .a { background: #fff; }
+
+.kind-tag { font-size: 11px; color: var(--caramel); background: var(--cream); padding: 2px 8px; border-radius: 10px; }
+.kind-tag:active { opacity: .6; }
+
+/* 按钮禁用态（如 picker 无可选项时） */
+.add-disabled { background: var(--line); color: var(--brown-2); }
+.add-disabled:active { background: var(--line); }

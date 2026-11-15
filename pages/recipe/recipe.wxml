@@ -1,0 +1,88 @@
+<!-- pages/recipe/recipe.wxml -->
+<!-- 只读总览页。刻意不做编辑：同一份配方只有一个可写入口（商品页），
+     避免「两个地方都能改」导致改完不知道以谁为准。 -->
+<view class="screen">
+  <view class="title">配方手册</view>
+  <view class="sub">{{summary}}</view>
+
+  <view class="seg">
+    <view class="seg-btn {{view==='good'?'active':''}}" data-v="good" bindtap="onSwitch">按商品</view>
+    <view class="seg-btn {{view==='mat'?'active':''}}" data-v="mat" bindtap="onSwitch">按原料</view>
+  </view>
+
+  <!-- ========== 视图一：按商品 ========== -->
+  <block wx:if="{{view==='good'}}">
+    <view wx:if="{{!hasGoods}}" class="card rb-empty">
+      <view class="et">还没有商品</view>
+      <view class="ed">先去「商品」页添加商品，再给它配配方原料</view>
+      <view class="add add-full" bindtap="onGoGoods">去商品页</view>
+    </view>
+    <block wx:else>
+      <view class="hint" wx:if="{{byGood.length>1}}">每行按金额从高到低排 · 条越长，说明这行越贵</view>
+
+      <!-- wx:for-index 用 gi / rx：内层索引绝不能与 item 字段同名（如 ri），
+           否则 wx:key 解析歧义，渲染层会错行 -->
+      <view class="card rb" wx:for="{{byGood}}" wx:for-item="g" wx:for-index="gi" wx:key="id">
+        <view class="rb-top">
+          <view class="rb-name">{{g.name}}</view>
+          <view class="rb-cost">¥{{g.costText}}</view>
+        </view>
+        <view class="rb-meta">{{g.metaText}}</view>
+
+        <view wx:if="{{!g.hasRecipe}}" class="rb-none">
+          还没配原料 ——
+          <text class="link" data-gid="{{g.id}}" bindtap="onEditGood">去配</text>
+        </view>
+        <block wx:else>
+          <view class="rb-row" wx:for="{{g.rows}}" wx:for-item="r" wx:for-index="rx" wx:key="ri">
+            <view class="rr-l1">
+              <text class="rr-n {{r.picked && !r.missing ? '' : 'warn'}}">{{r.matName}}</text>
+              <text class="rr-a">{{r.amountText}}{{r.unitLabel}}</text>
+              <text class="rr-s">¥{{r.subText}}</text>
+            </view>
+            <view class="rr-l2">
+              <view class="rr-bar"><view class="rr-in" style="width:{{r.barW}}%"></view></view>
+              <text class="rr-p">{{r.pctText}}%</text>
+            </view>
+          </view>
+
+          <view class="rb-foot">
+            <view class="rf-item"><text class="rf-k">材料</text><text class="rf-v">¥{{g.matBaseText}}</text></view>
+            <view class="rf-item" wx:if="{{g.hasLoss}}"><text class="rf-k">损耗 {{g.lossRatePct}}%</text><text class="rf-v rf-loss">+¥{{g.lossAddText}}</text></view>
+            <view class="rf-item"><text class="rf-k">成本</text><text class="rf-v rf-strong">¥{{g.costText}}</text></view>
+          </view>
+        </block>
+      </view>
+    </block>
+  </block>
+
+  <!-- ========== 视图二：按原料 ========== -->
+  <block wx:else>
+    <view wx:if="{{!hasMats}}" class="card rb-empty">
+      <view class="et">还没有原料</view>
+      <view class="ed">配方只能从原料库选，先去添加原料（名称、价格、采购量、单位）</view>
+      <view class="add add-full" bindtap="onGoMaterial">去原料页</view>
+    </view>
+    <block wx:else>
+      <view class="hint">被越多商品用到的排在前面 · 原料涨价时，这里就是受影响清单</view>
+
+      <view class="card rb" wx:for="{{byMat}}" wx:for-item="m" wx:for-index="mi" wx:key="id">
+        <view class="rb-top">
+          <view class="rb-name">{{m.name}}</view>
+          <view class="mb-price">¥{{m.pricePerKgText}}/kg</view>
+        </view>
+        <view class="rb-meta {{m.useCount ? '' : 'dim'}}">{{m.metaText}}</view>
+
+        <view wx:if="{{m.useCount>0}}" class="mb-list">
+          <view class="mb-row" wx:for="{{m.uses}}" wx:for-item="u" wx:for-index="ux" wx:key="ui">
+            <text class="mb-g">{{u.goodName}}</text>
+            <text class="mb-a">{{u.amountText}}{{u.unitLabel}}</text>
+            <text class="mb-s">¥{{u.subText}}</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </block>
+
+  <view class="foot-note">数据与「商品」「原料」页实时一致 · 修改仍需回对应页面</view>
+</view>

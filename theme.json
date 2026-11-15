@@ -1,0 +1,20 @@
+{
+  "light": {
+    "navBgColor": "#FBF4EC",
+    "navTxtStyle": "black",
+    "bgColor": "#FBF4EC",
+    "tabBarBgColor": "#FFFFFF",
+    "tabBarTextColor": "#4A3B2E",
+    "tabBarSelectedColor": "#FFC400",
+    "tabBarBorderStyle": "white"
+  },
+  "dark": {
+    "navBgColor": "#211A14",
+    "navTxtStyle": "white",
+    "bgColor": "#211A14",
+    "tabBarBgColor": "#F2EBDD",
+    "tabBarTextColor": "#4A3B2E",
+    "tabBarSelectedColor": "#FFC400",
+    "tabBarBorderStyle": "white"
+  }
+}

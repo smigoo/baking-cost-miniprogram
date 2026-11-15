@@ -1,0 +1,31 @@
+{
+  "pages": [
+    "pages/daily/daily",
+    "pages/material/material",
+    "pages/goods/goods",
+    "pages/monthly/monthly",
+    "pages/recipe/recipe"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#FBF4EC",
+    "navigationBarTitleText": "烘焙成本",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FBF4EC"
+  },
+  "tabBar": {
+    "color": "#4A3B2E",
+    "selectedColor": "#FFC400",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/daily/daily", "text": "记销量", "iconPath": "images/tabbar/tab-record.png", "selectedIconPath": "images/tabbar/tab-record-on.png" },
+      { "pagePath": "pages/material/material", "text": "原料", "iconPath": "images/tabbar/tab-material.png", "selectedIconPath": "images/tabbar/tab-material-on.png" },
+      { "pagePath": "pages/goods/goods", "text": "商品", "iconPath": "images/tabbar/tab-goods.png", "selectedIconPath": "images/tabbar/tab-goods-on.png" },
+      { "pagePath": "pages/monthly/monthly", "text": "经营报表", "iconPath": "images/tabbar/tab-report.png", "selectedIconPath": "images/tabbar/tab-report-on.png" }
+    ]
+  },
+  "style": "v2",
+  "darkmode": true,
+  "themeLocation": "theme.json",
+  "sitemapLocation": "sitemap.json"
+}

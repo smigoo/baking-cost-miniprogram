@@ -1,0 +1,189 @@
+/* pages/goods/goods.wxss —— 商品卡视觉梳理（协调烘焙暖色） */
+.title { margin-bottom: 4px; }
+
+/* 配方手册入口：浅奶油底 + 焦糖橙标题，弱于主卡片但明显可点，不抢商品卡的注意力 */
+.rb-entry {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card); border-radius: 14px; padding: 12px 14px;
+  margin: 0 0 14px; box-shadow: 0 4px 16px rgba(74,59,46,.07);
+}
+.rb-entry:active { background: var(--cream); }
+.re-body { flex: 1; min-width: 0; }
+.re-title { font-size: 14px; font-weight: 700; color: var(--caramel); }
+.re-sub { font-size: 11px; color: var(--brown-2); margin-top: 3px; }
+
+/* 卡头：商品名 + 折叠 + 删除 */
+.good-head { display: flex; align-items: center; gap: 10px; }
+.good-head .name { flex: 1; min-width: 0; }
+.name-input { width: 100%; border: none; background: transparent; font-size: 17px; font-weight: 700; color: var(--brown); outline: none; }
+.name-input:focus { border-bottom: 1px solid var(--caramel); }
+.good-head .chev { font-size: 16px; color: var(--brown-2); transition: transform .25s; flex-shrink: 0; width: 28rpx; text-align: center; }
+.good.collapsed .chev { transform: rotate(-90deg); }
+/* 卡头删除：与配方行删除同一视觉规格（32px 方形热区 + 常态减淡），避免两处 ✕ 长得不一样 */
+.good-head .del { flex: 0 0 auto; width: 32px; height: 32px; line-height: 32px; text-align: center; font-size: 16px; color: var(--brown-2); opacity: .55; border-radius: 8px; }
+.good-head .del:active { opacity: 1; color: var(--brick); background: rgba(207,106,79,.12); }
+
+.good-body { margin-top: 12px; }
+
+/* 售价：独立醒目行 */
+.price-edit { display: flex; align-items: center; justify-content: space-between; padding: 6px 0 12px; border-bottom: 1px solid var(--line); }
+.pe-lbl { font-size: 13px; color: var(--brown-2); }
+.pe-input { display: flex; align-items: center; background: var(--cream); border-radius: 10px; padding: 7px 14px; }
+.pe-prefix { color: var(--brown-2); font-size: 16px; margin-right: 4px; }
+.price-input { width: 140rpx; text-align: right; font-size: 19px; font-weight: 700; color: var(--brown); }
+
+/* 成本/毛利/毛利率：三色 stat */
+.calc-grid { display: flex; gap: 8px; margin: 12px 0; }
+.calc-cell { flex: 1; background: var(--cream); border-radius: 12px; padding: 11px 8px; text-align: center; }
+.ck { display: block; font-size: 11px; color: var(--brown-2); margin-bottom: 4px; }
+.cv { font-size: 15px; font-weight: 700; color: var(--brown); }
+.cv-profit { color: var(--olive); }
+
+/* 损耗率 */
+.loss-edit { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
+.le-lbl { font-size: 13px; color: var(--brown-2); }
+.loss-edit .loss { width: 96rpx; }
+
+/* 配方：cream 容器包裹行列表，与卡片白底拉出「可编辑区」的层级暗示 */
+.recipe { background: var(--cream); border-radius: 12px; padding: 4px 10px; margin-top: 10px; }
+
+/* 行：三列按信息长度给语义宽度——原料名最长、用量最短，等宽会让短名一头空、长名一头挤 */
+.recipe-row { display: flex; align-items: center; gap: 6px; padding: 8px 0; border-top: 1px solid var(--line); }
+.recipe-row:first-child { border-top: none; }
+
+/* 主选择：原料（占最多宽度）。line-height 与内容高度对齐，兼底内部任何文本的垂直居中 */
+.recipe-row .sel {
+  flex: 1.45; min-width: 0; box-sizing: border-box;
+  height: 36px; line-height: 34px; padding: 0 8rpx;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--surface);
+  color: var(--brown); font-size: 13px; overflow: hidden; white-space: nowrap;
+}
+/* 用量：数字居中 + 窄列，跟两侧选择器拉开形态差异，一眼能认出「这里填数」 */
+.recipe-row .num-input {
+  flex: 0.85; min-width: 0; box-sizing: border-box;
+  height: 36px; padding: 0 4rpx;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--surface);
+  color: var(--brown); font-size: 13px; text-align: center;
+}
+.recipe-row .num-input:focus { border-color: var(--caramel); }
+/* 单位：次级参数，用「无边框 + 浅底」降一档层级，不与原料选择器抢主次 */
+.recipe-row .unit-sel {
+  flex: 1.05; min-width: 0; box-sizing: border-box;
+  height: 36px; line-height: 34px; padding: 0 8rpx;
+  border: 1px solid transparent; border-radius: 8px; background: var(--line);
+  color: var(--brown-2); font-size: 13px; overflow: hidden; white-space: nowrap;
+}
+/* picker 内部：文案 + ▾ 下拉指示，让「可以点、可以选」一眼可见
+   原料名保持左对齐（列表惯例，超长时只在尾部省略）；单位列居中，短文本不显偏
+   注意：height:100% 在 picker 的 slot 里算不出来（父级是原生组件壳），
+   会导致文字贴上沿。必须用 line-height 定高（36px - 上下各 1px 边框 = 34px）来垂直居中。 */
+.recipe-row .picker-text {
+  display: flex; align-items: center;
+  height: 34px; line-height: 34px;
+  overflow: hidden;
+}
+.recipe-row .pt-label { flex: 1; min-width: 0; line-height: inherit; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recipe-row .unit-sel .pt-label { text-align: center; }
+.recipe-row .pt-caret { flex-shrink: 0; margin-left: 4rpx; font-size: 11px; line-height: inherit; color: var(--brown-2); opacity: .6; }
+/* 未选原料的行：虚线焦糖边框 + 淡底 + 焦糖色「选择原料 ▾」，明确提示需要下拉选择 */
+.recipe-row.unpicked .sel { border: 1px dashed var(--caramel); background: rgba(222,138,78,.08); }
+.recipe-row .pt-empty .pt-label { color: var(--caramel); font-weight: 600; }
+.recipe-row .pt-empty .pt-caret { color: var(--caramel); opacity: 1; }
+/* 配方行引用的原料已被删除：用砖红色明确提示，而不是显示一片空白 */
+.recipe-row .pt-missing { color: var(--brick); font-size: 13px; }
+.recipe-row .pt-missing .pt-label { color: var(--brick); font-weight: 600; }
+/* 删除按钮：固定 30px 方形热区贴住行尾（不用 min-width，避免撑开列间距），常态减淡不抢视线 */
+.recipe-row .del {
+  flex: 0 0 auto; width: 30px; height: 30px; line-height: 30px;
+  text-align: center; font-size: 15px; color: var(--brown-2); opacity: .55;
+  border-radius: 8px;
+}
+.recipe-row .del:active { opacity: 1; color: var(--brick); background: rgba(207,106,79,.12); }
+
+/* 次级操作「+ 加原料」：虚线描边，与上方 cream 容器同色系，
+   把实心焦糖留给卡底的「+ 添加商品」主按钮，避免两个实心按钮抢焦点 */
+.add.add-recipe {
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-top: 8px; padding: 7px 16px;
+  border: 1px dashed var(--caramel); border-radius: 999px;
+  background: transparent; color: var(--caramel);
+  font-size: 12.5px; font-weight: 600;
+}
+.add.add-recipe:active { background: rgba(222,138,78,.10); }
+
+/* 加原料按钮（卡内） */
+.add-good { display: block; text-align: center; margin: 6px auto 0; }
+
+/* 空状态引导 */
+.goods-empty { background: var(--surface); border: 1px dashed var(--line); border-radius: 16px; padding: 34px 24px; text-align: center; margin: 8px 0 4px; }
+.ge-mark { width: 34px; height: 34px; margin: 0 auto 14px; border: 3px solid var(--caramel); border-radius: 10px; position: relative; opacity: .65; }
+.ge-mark::after { content: ''; position: absolute; width: 12px; height: 3px; background: var(--caramel); left: 50%; top: 50%; transform: translate(-50%, -50%); border-radius: 2px; }
+.ge-title { font-size: 15px; font-weight: 700; color: var(--brown); margin-bottom: 6px; }
+.ge-sub { font-size: 12px; color: var(--brown-2); line-height: 1.6; }
+
+/* ===== 定价健康提示条（常驻卡头下方，折叠时也可见） =====
+   语义：这条不是「另一个成本数字」，而是「你现在填的售价能不能卖」的判词。
+   四态四色：健康=橄榄绿 / 偏低=蜂蜜黄 / 低于保本=砖红 / 未知=灰。 */
+.pricing-bar {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 10px; padding: 8px 10px;
+  border-radius: 10px; background: var(--cream);
+  border-left: 3px solid var(--brown-2);
+}
+.pb-tag {
+  flex: 0 0 auto; font-size: 11px; font-weight: 700;
+  padding: 2px 7px; border-radius: 6px;
+  color: #fff; background: var(--brown-2);
+  white-space: nowrap;
+}
+.pb-text {
+  flex: 1; min-width: 0; font-size: 12px; color: var(--brown);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.pb-more { flex: 0 0 auto; font-size: 12px; color: var(--brown-2); }
+
+.pricing-bar.ok { border-left-color: var(--olive); background: rgba(139,174,107,.10); }
+.pricing-bar.ok .pb-tag { background: var(--olive); }
+.pricing-bar.low { border-left-color: var(--honey); background: rgba(242,183,94,.14); }
+.pricing-bar.low .pb-tag { background: var(--honey); color: #4A3B2E; }
+.pricing-bar.loss { border-left-color: var(--brick); background: rgba(207,106,79,.12); }
+.pricing-bar.loss .pb-tag { background: var(--brick); }
+.pricing-bar.loss .pb-text { color: var(--brick); font-weight: 600; }
+.pricing-bar.unset .pb-tag { background: var(--brown-2); }
+.pricing-bar.unknown { border-left-color: var(--line); }
+
+/* ===== 定价明细（展开后） ===== */
+.pricing-panel {
+  margin: 4px 0 10px; padding: 10px 12px;
+  background: var(--cream); border-radius: 12px;
+}
+.pp-h { font-size: 12px; font-weight: 700; color: var(--brown); margin-bottom: 8px; }
+.pp-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
+.pp-k { font-size: 12.5px; color: var(--brown-2); }
+.pp-v { font-size: 13px; color: var(--brown); font-weight: 600; }
+.pp-lack { color: var(--brick); font-weight: 400; font-size: 12px; }
+.pp-total { border-top: 1px dashed var(--line); margin-top: 4px; padding-top: 7px; }
+.pp-hl-row .pp-v { color: var(--caramel); font-size: 14px; }
+.pp-warn {
+  margin-top: 6px; padding: 6px 8px; border-radius: 8px;
+  background: rgba(207,106,79,.10); color: var(--brick);
+  font-size: 11.5px; line-height: 1.5;
+}
+.pp-note { font-size: 11.5px; color: var(--brick); line-height: 1.6; margin-top: 3px; }
+.pp-foot { font-size: 11px; color: var(--brown-2); margin-top: 8px; line-height: 1.5; }
+
+/* 商品级定价参数：包装 / 工时 —— 两列并排，控件与配方行同高（34px 内容区） */
+.pp-inputs { display: flex; gap: 10px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.pp-field { flex: 1; min-width: 0; }
+.pp-fl { display: block; font-size: 11px; color: var(--brown-2); margin-bottom: 4px; }
+.pp-num {
+  width: 100%; box-sizing: border-box;
+  height: 34px; line-height: 34px; padding: 0 8rpx;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--surface); color: var(--brown);
+  font-size: 13px; text-align: right; outline: none;
+}
+.pp-num:focus { border-color: var(--caramel); }
+
+/* 折叠：箭头旋转之外必须真的收起内容，否则「一屏扫所有商品定价」无从谈起 */
+.good.collapsed .good-body { display: none; }

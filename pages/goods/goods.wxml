@@ -1,0 +1,148 @@
+<!-- pages/goods/goods.wxml -->
+<view class="screen">
+  <view class="title">商品</view>
+  <view class="sub">点 ▾ 折叠/展开；设售价、损耗，再选原料+用量混合。切换原料时用量单位会自动同步为该原料的采购单位</view>
+
+  <!-- 配方手册入口：商品多了以后逐张卡展开看配方太低效，
+       手册按「每行花多少钱」排序并支持按原料反查，此处只做跳转 -->
+  <view class="rb-entry" bindtap="onOpenRecipeBook">
+    <view class="re-body">
+      <view class="re-title">配方手册 ›</view>
+      <view class="re-sub">看每样原料花了多少 · 按原料反查用在哪些商品</view>
+    </view>
+  </view>
+
+  <!-- wx:for-item="g" 不能省：模板内部全部以 g.xxx 取值，缺了它变量作用域落空，
+       整张卡会退化成「只剩静态 label + placeholder」，配方行也一条都渲染不出来 -->
+  <view class="card good {{g.collapsed?'collapsed':''}}" wx:for="{{goods}}" wx:for-item="g" wx:for-index="gi" wx:key="id" id="good-{{g.id}}">
+    <view class="good-head">
+      <view class="name"><input class="name-input" value="{{g.name}}" data-gid="{{g.id}}" data-gi="{{gi}}" data-k="name" bindinput="onHeadInput" placeholder="商品名"/></view>
+      <view class="chev" data-gid="{{g.id}}" data-gi="{{gi}}" bindtap="onToggleHead">▾</view>
+      <view class="del" data-gid="{{g.id}}" data-gi="{{gi}}" bindtap="onDelGood">✕</view>
+    </view>
+    <!-- 定价健康提示：常驻卡头下方（卡片折叠时也可见），让用户一眼看出「这个价能不能卖」。
+         点它展开定价明细，卡片若处于折叠态会自动展开。 -->
+    <view class="pricing-bar {{g.pricing.status}}" data-gid="{{g.id}}" data-gi="{{gi}}" bindtap="onTogglePricing">
+      <view class="pb-tag">{{g.pricingTag}}</view>
+      <view class="pb-text">{{g.pricing.statusText}}</view>
+      <view class="pb-more">{{g.pricingOpen ? '收起' : '明细'}} ▾</view>
+    </view>
+
+    <view class="good-body">
+      <!-- 售价：独立醒目行 -->
+      <view class="price-edit">
+        <text class="pe-lbl">售价(元)</text>
+        <view class="pe-input"><text class="pe-prefix">¥</text><input class="num-input price" type="digit" value="{{g.price}}" data-gid="{{g.id}}" data-gi="{{gi}}" data-k="price" bindinput="onHeadInput" placeholder="0.00"/></view>
+      </view>
+
+      <!-- 成本 / 毛利 / 毛利率：三色 stat -->
+      <view class="calc-grid">
+        <view class="calc-cell"><text class="ck">成本</text><text class="cv">{{g.costText}}</text></view>
+        <view class="calc-cell"><text class="ck">单品毛利</text><text class="cv cv-profit">{{g.profitText}}</text></view>
+        <view class="calc-cell"><text class="ck">毛利率</text><text class="cv" style="color:{{g.marginColor}}">{{g.marginText}}%</text></view>
+      </view>
+
+      <!-- 定价明细：逐项可核对，缺项显式标注「未填」而不是 0.00。
+           成本项固定 5 行 → 用静态行而不是嵌套 wx:for：
+           1) 行序恒定，不会因数据顺序变化而错位；
+           2) 避免「循环里套循环 + wx:key」在渲染层触发崩溃（实测点明细即报
+              Cannot read properties of undefined (reading '0')）。 -->
+      <view class="pricing-panel" wx:if="{{g.pricingOpen}}">
+        <view class="pp-h">建议售价怎么算出来的</view>
+        <view class="pp-row">
+          <text class="pp-k">材料（含损耗）</text>
+          <text class="pp-v">{{g.pricing.materialText}}</text>
+        </view>
+        <view class="pp-row">
+          <text class="pp-k">包装</text>
+          <text class="pp-v {{g.pricing.lackPack?'pp-lack':''}}">{{g.pricing.packText}}</text>
+        </view>
+        <view class="pp-row">
+          <text class="pp-k">人工</text>
+          <text class="pp-v {{g.pricing.lackLabor?'pp-lack':''}}">{{g.pricing.laborText}}</text>
+        </view>
+        <view class="pp-row">
+          <text class="pp-k">固定分摊</text>
+          <text class="pp-v {{g.pricing.lackCapacity?'pp-lack':''}}">{{g.pricing.fixedText}}</text>
+        </view>
+        <view class="pp-row">
+          <text class="pp-k">渠道费</text>
+          <text class="pp-v">{{g.pricing.feeText}}</text>
+        </view>
+        <view class="pp-row pp-total">
+          <text class="pp-k">全成本（不含渠道费）</text>
+          <text class="pp-v">¥{{g.pricing.otherText}}</text>
+        </view>
+        <view class="pp-row pp-hl-row">
+          <text class="pp-k">保本价 → 建议价</text>
+          <text class="pp-v">{{g.pricing.breakEvenText}} → {{g.pricing.suggestText}}</text>
+        </view>
+        <view class="pp-row pp-hl-row">
+          <text class="pp-k">按建议价卖出，每个净赚</text>
+          <text class="pp-v">{{g.pricing.earnText}}</text>
+        </view>
+        <view class="pp-row">
+          <text class="pp-k">售价是材料成本的</text>
+          <text class="pp-v">{{g.pricing.multipleText}}</text>
+        </view>
+        <view class="pp-warn" wx:if="{{g.pricing.multipleWarn}}">售价已是材料成本的 {{g.pricing.multipleText}}，多半是工时、包装或月产能有一项没填，核对后再定价更准</view>
+        <view class="pp-note" wx:if="{{g.pricing.lackCapacity}}">· 未设月产能，固定成本未分摊，价格偏低</view>
+        <view class="pp-note" wx:if="{{g.pricing.lackHourly}}">· 未设时薪，人工未计入，价格偏低</view>
+        <view class="pp-note" wx:if="{{g.pricing.lackHours}}">· 该商品未填工时，人工按 0 计</view>
+        <view class="pp-note" wx:if="{{g.pricing.lackPack}}">· 未填包装耗材</view>
+
+        <!-- 商品级参数：包装与工时，直接影响上面的人工与包装两项 -->
+        <view class="pp-inputs">
+          <view class="pp-field">
+            <text class="pp-fl">包装(元/件)</text>
+            <input class="pp-num" type="digit" value="{{g.packCost}}" data-gid="{{g.id}}" data-gi="{{gi}}" data-k="packCost" bindinput="onPricingInput" placeholder="0"/>
+          </view>
+          <view class="pp-field">
+            <text class="pp-fl">工时(小时/件)</text>
+            <input class="pp-num" type="digit" value="{{g.laborHours}}" data-gid="{{g.id}}" data-gi="{{gi}}" data-k="laborHours" bindinput="onPricingInput" placeholder="0"/>
+          </view>
+        </view>
+        <view class="pp-foot">时薪、月产能、目标净利率在「经营报表 → 定价参数」里统一设置</view>
+      </view>
+
+      <!-- 损耗率 -->
+      <view class="loss-edit">
+        <text class="le-lbl">损耗率(%)</text>
+        <input class="num-input loss" type="digit" value="{{g.lossRateText}}" data-gid="{{g.id}}" data-gi="{{gi}}" data-k="loss" bindinput="onHeadInput" placeholder="0"/>
+      </view>
+
+      <!-- 配方 -->
+      <view class="recipe">
+        <!-- wx:key 必须指向行数据里真实存在的字段：数据层已给每行注入 ri，用它稳定复用节点 -->
+        <view wx:for="{{g.recipe}}" wx:for-item="r" wx:for-index="ri" wx:key="ri"
+              class="recipe-row {{r.picked?'':'unpicked'}}" id="rc-{{g.id}}-{{ri}}">
+          <picker class="sel" range="{{g.matOptions}}" range-key="label" data-gid="{{g.id}}" data-gi="{{gi}}" data-i="{{ri}}" data-k="m" bindchange="onRecipeChange" disabled="{{g.matOptions.length===0}}">
+            <view class="picker-text {{r.missing?'pt-missing':''}} {{r.matName?'':'pt-empty'}}">
+              <text class="pt-label">{{r.matName || (r.missing ? '原料已删除·重选' : '选择原料')}}</text>
+              <text class="pt-caret">▾</text>
+            </view>
+          </picker>
+          <input class="num-input" type="digit" value="{{r.g}}" data-gid="{{g.id}}" data-gi="{{gi}}" data-i="{{ri}}" data-k="g" bindinput="onRecipeInput" placeholder="用量"/>
+          <picker class="unit-sel" range="{{r.unitOpts}}" range-key="label" value="{{r.unitIdx||0}}" data-gid="{{g.id}}" data-gi="{{gi}}" data-i="{{ri}}" data-k="unit" bindchange="onRecipeUnitChange">
+            <view class="picker-text">
+              <text class="pt-label">{{r.unitLabel}}</text>
+              <text class="pt-caret">▾</text>
+            </view>
+          </picker>
+          <view class="del" data-gid="{{g.id}}" data-gi="{{gi}}" data-i="{{ri}}" bindtap="onDelRecipe">✕</view>
+        </view>
+        <view wx:if="{{g.recipe.length===0}}" class="sub" style="padding:4px 0">还没配原料，点下面「+ 加原料」</view>
+      </view>
+
+      <view class="add add-recipe" data-gid="{{g.id}}" data-gi="{{gi}}" bindtap="onAddRecipe">+ 加原料</view>
+    </view>
+  </view>
+
+  <view wx:if="{{goods.length===0}}" class="goods-empty">
+    <view class="ge-mark"></view>
+    <view class="ge-title">还没有商品</view>
+    <view class="ge-sub">点下方按钮添加第一个商品，设好售价并选原料即可自动核算成本与毛利</view>
+  </view>
+
+  <view class="add add-good" bindtap="onAddGood">+ 添加商品</view>
+</view>

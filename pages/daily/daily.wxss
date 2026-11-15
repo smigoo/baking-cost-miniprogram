@@ -1,0 +1,24 @@
+/* pages/daily/daily.wxss —— 页面特有样式（通用类见 app.wxss） */
+.ring {
+  width: 110px; height: 110px; border-radius: 50%; position: relative; flex-shrink: 0;
+}
+.ring-inner {
+  position: absolute; inset: 14px; background: var(--surface); border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.ring-inner .big { font-size: 16px; font-weight: 700; color: var(--caramel); }
+.ring-inner .lbl { font-size: 10px; color: var(--brown-2); }
+
+/* 表头「+ 添加商品」：小黄胶囊 */
+.add2 { float: right; background: var(--caramel); color: #FFFFFF; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 999px; }
+.add2:active { background: var(--honey); }
+
+/* 数量步进器（参考图：− 数字 + 胶囊） */
+.row-good { align-items: center; }
+.stepper { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--surface); }
+.step-btn { width: 34px; height: 32px; line-height: 32px; text-align: center; font-size: 18px; font-weight: 700; color: #FFFFFF; background: var(--caramel); }
+.step-btn:active { background: var(--honey); }
+.step-num { width: 46px; text-align: center; font-size: 14px; color: var(--brown); border: none; background: transparent; min-height: 32px; }
+
+.day-picker { margin-bottom: 10px; padding: 10px; background: var(--cream); border-radius: 10px; }
+.picker-text { padding: 4px 0; color: var(--brown); font-size: 13px; }

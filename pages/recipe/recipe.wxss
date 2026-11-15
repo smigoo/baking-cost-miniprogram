@@ -1,0 +1,66 @@
+/* pages/recipe/recipe.wxss —— 配方手册（只读总览，与商品页同一套暖色变量） */
+
+.hint { font-size: 11px; color: var(--brown-2); margin: -4px 2px 10px; line-height: 1.5; }
+
+/* ===== 卡片 ===== */
+.rb { padding: 14px 14px 12px; }
+.rb-top { display: flex; align-items: baseline; gap: 10px; }
+.rb-name {
+  flex: 1; min-width: 0; font-size: 16px; font-weight: 700; color: var(--brown);
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.rb-cost { font-size: 17px; font-weight: 700; color: var(--brick); flex-shrink: 0; }
+.rb-meta { font-size: 11px; color: var(--brown-2); margin-top: 3px; }
+.rb-meta.dim { opacity: .7; }
+.mb-price { font-size: 12px; color: var(--brown-2); flex-shrink: 0; }
+
+.rb-none { font-size: 12px; color: var(--brown-2); background: var(--cream); border-radius: 10px; padding: 10px 12px; margin-top: 10px; }
+.link { color: var(--caramel); font-weight: 600; }
+.link:active { opacity: .6; }
+
+/* ===== 配方行（按商品） ===== */
+.rb-row { padding: 9px 0 8px; border-top: 1px solid var(--line); margin-top: 10px; }
+.rb-row:first-of-type { margin-top: 8px; }
+.rr-l1 { display: flex; align-items: baseline; gap: 8px; }
+/* 原料名最长，给可伸缩宽度；用量与金额定宽右对齐，扫读时数字能对齐成一列 */
+.rr-n {
+  flex: 1; min-width: 0; font-size: 13.5px; color: var(--brown);
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.rr-n.warn { color: var(--brick); }
+.rr-a { font-size: 12px; color: var(--brown-2); flex-shrink: 0; min-width: 68rpx; text-align: right; }
+.rr-s { font-size: 13.5px; font-weight: 700; color: var(--brown); flex-shrink: 0; min-width: 104rpx; text-align: right; }
+
+.rr-l2 { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.rr-bar { flex: 1; height: 6px; background: var(--cream); border-radius: 3px; overflow: hidden; }
+.rr-in { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--honey), var(--caramel)); }
+.rr-p { font-size: 11px; color: var(--brown-2); flex-shrink: 0; min-width: 64rpx; text-align: right; }
+
+/* ===== 合计行 ===== */
+.rb-foot {
+  display: flex; flex-wrap: wrap; gap: 6px 16px;
+  margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line);
+}
+.rf-item { display: flex; align-items: baseline; gap: 4px; }
+.rf-k { font-size: 11px; color: var(--brown-2); }
+.rf-v { font-size: 13px; font-weight: 600; color: var(--brown); }
+.rf-loss { color: var(--brick); }
+.rf-strong { color: var(--caramel); font-weight: 700; }
+
+/* ===== 反查列表（按原料） ===== */
+.mb-list { margin-top: 10px; border-top: 1px solid var(--line); }
+.mb-row { display: flex; align-items: baseline; gap: 8px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.mb-row:last-child { border-bottom: none; padding-bottom: 2px; }
+.mb-g {
+  flex: 1; min-width: 0; font-size: 13px; color: var(--brown);
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.mb-a { font-size: 12px; color: var(--brown-2); flex-shrink: 0; min-width: 68rpx; text-align: right; }
+.mb-s { font-size: 13px; font-weight: 700; color: var(--brown); flex-shrink: 0; min-width: 104rpx; text-align: right; }
+
+/* ===== 空态 ===== */
+.rb-empty { text-align: center; padding: 28px 18px; }
+.rb-empty .et { font-size: 15px; font-weight: 700; color: var(--brown); }
+.rb-empty .ed { font-size: 12px; color: var(--brown-2); margin: 8px 0 16px; line-height: 1.6; }
+
+.foot-note { text-align: center; font-size: 11px; color: var(--brown-2); padding: 8px 0 4px; opacity: .8; }

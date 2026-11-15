@@ -1,0 +1,182 @@
+<!-- pages/monthly/monthly.wxml -->
+<view class="screen">
+  <view class="title">经营报表</view>
+  <view class="sub">选月份查看整月盈亏、毛利率健康与商品排行</view>
+
+  <!-- 月份切换：原七行日期格子已删——点格子只切到同月、sel 写死 false，是点了没反应的废交互。
+       漏记日期改在下方 banner 的覆盖率提示里列出，长图的逐日毛利柱也保留。 -->
+  <view class="card month-nav">
+    <view class="cal-head">
+      <view class="mbtn" bindtap="prevMonth">‹</view>
+      <view class="m">{{calMonthLabel}}</view>
+      <view class="mbtn" bindtap="nextMonth">›</view>
+    </view>
+    <text class="kind-tag" bindtap="backToday">回到今天</text>
+  </view>
+
+  <!-- 净利润 banner -->
+  <view class="banner">
+    <view class="cov-tag" style="background:{{covBg}};color:{{covColor}}">{{covLabel}}</view>
+    <view class="lbl">{{monthLbl}}</view>
+    <view class="big">{{net}}</view>
+    <view class="badge">{{badge}}</view>
+  </view>
+
+  <!-- 营收构成 -->
+  <view class="card">
+    <view class="card-h2">营收构成</view>
+    <view class="donut-row">
+      <view class="ring" style="background: conic-gradient({{ringColor}} {{profitDeg}}deg, var(--cream) 0);">
+        <view class="ring-inner"><text class="big" style="color:{{ringColor}}">{{netRateText}}</text><text class="lbl">净利率</text></view>
+      </view>
+      <view class="legend">
+        <view class="legend-row"><view class="legend-left"><view class="dot" style="background:var(--olive)"></view>净利润</view><view class="val">{{net}}</view></view>
+        <view class="legend-row"><view class="legend-left"><view class="dot" style="background:var(--caramel)"></view>总成本</view><view class="val">{{costVal}}</view></view>
+        <view class="legend-row"><view class="legend-left">毛利率</view><view class="val" style="color:{{grossColor}}">{{grossVal}}</view></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 本月汇总 -->
+  <view class="card">
+    <view class="card-h2">本月汇总</view>
+    <view class="stat-grid">
+      <view class="stat"><view class="k">月营收</view><view class="v">{{rev}}</view></view>
+      <view class="stat"><view class="k">月毛利</view><view class="v" style="color:var(--olive)">{{gross}}</view></view>
+      <view class="stat"><view class="k">{{fixedK}}</view><view class="v">{{fixed}}</view></view>
+      <view class="stat {{rNetClass}}"><view class="k">月净利</view><view class="v">{{rNet}}</view></view>
+    </view>
+  </view>
+
+  <!-- 商品毛利率健康 -->
+  <view class="card">
+    <view class="card-h2">商品毛利率健康</view>
+    <view class="donut-row">
+      <view class="ring" style="background: conic-gradient({{gaugeColor}} {{avgMDeg}}deg, var(--cream) 0);">
+        <view class="ring-inner"><text class="big" style="color:{{gaugeColor}}">{{gaugeText}}</text><text class="lbl">平均毛利率</text></view>
+      </view>
+      <view class="legend">
+        <view class="legend-row warn-row" bindtap="toggleWarn">
+          <view class="legend-left">低毛利预警（&lt;30%）</view>
+          <view class="val" style="color:var(--brick)">{{lowWarn.length}} ▾</view>
+        </view>
+      </view>
+    </view>
+    <view class="sub" style="margin-top:6px">平均毛利率 = 各商品配方毛利率的均值（不按销量加权），不等同于「营收构成」里的销售加权毛利率</view>
+    <view wx:if="{{warnListShow}}">
+      <view wx:for="{{lowWarn}}" wx:key="name" class="warn-item" data-gid="{{item.gid}}" bindtap="onTapWarn">
+        <text>{{item.name}}</text><text class="wfix">毛利 {{item.margin}}% · 去改配方 ›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 固定支出 -->
+  <view class="card">
+    <view class="card-h2">固定支出（按月）</view>
+    <!-- 单行到底：名称（可编辑）— 金额 + 「元」后缀 — 删除。不把 label 压在输入框上方，否则每行被撑成两行、标签浮空 -->
+    <view wx:for="{{fixedList}}" wx:key="idx" class="fix-row {{index>0?'sep':''}}">
+      <input class="fix-name" value="{{item.name}}" data-i="{{index}}" data-k="name" bindinput="onFixedInput" bindblur="onFixedBlur" placeholder="支出项" />
+      <view class="fix-amount">
+        <input class="fix-num" type="digit" value="{{item.amount}}" data-i="{{index}}" data-k="amount" bindinput="onFixedInput" bindblur="onFixedBlur" placeholder="0" />
+        <text class="fix-unit">元</text>
+      </view>
+      <view class="fix-del" data-i="{{index}}" bindtap="onFixedDel">✕</view>
+    </view>
+    <view class="add" bindtap="onFixedAdd">+ 添加支出项</view>
+  </view>
+
+  <!-- 定价参数（全局）：紧接固定支出，因为「月产能」和「固定支出」回答的是同一类问题——一个月摊多少。
+       这里只放全局参数；包装与工时是商品级，在各商品卡的定价明细里填。 -->
+  <view class="card">
+    <view class="card-h2">定价参数</view>
+    <view class="set-hint">影响商品页的保本价与建议售价。示例值请按自己的实际情况修改。</view>
+
+    <view class="set-row">
+      <text class="set-lbl">时薪</text>
+      <view class="fix-amount">
+        <input class="fix-num" type="digit" value="{{pricingSettings.hourlyRate}}" data-k="hourlyRate" bindinput="onSettingInput" placeholder="未填" />
+        <text class="fix-unit">元/时</text>
+      </view>
+    </view>
+
+    <view class="set-row sep">
+      <text class="set-lbl">月产能</text>
+      <view class="fix-amount">
+        <input class="fix-num" type="digit" value="{{pricingSettings.monthlyCapacity}}" data-k="monthlyCapacity" bindinput="onSettingInput" placeholder="未填" />
+        <text class="fix-unit">件/月</text>
+      </view>
+    </view>
+    <view class="set-note">固定支出合计 {{pricingSettings.fixedTotal}} 元 ÷ 月产能 = 每件分摊的固定成本。未填则不计入，算出的价格会偏低。</view>
+
+    <view class="set-row sep">
+      <text class="set-lbl">目标净利率</text>
+      <view class="fix-amount">
+        <input class="fix-num" type="digit" value="{{pricingSettings.targetMarginPct}}" data-k="targetMargin" bindinput="onSettingInput" placeholder="40" />
+        <text class="fix-unit">%</text>
+      </view>
+    </view>
+
+    <view class="set-row sep">
+      <text class="set-lbl">渠道费率</text>
+      <view class="fix-amount">
+        <input class="fix-num" type="digit" value="{{pricingSettings.channelFeePct}}" data-k="channelFee" bindinput="onSettingInput" placeholder="0.6" />
+        <text class="fix-unit">%</text>
+      </view>
+    </view>
+    <view class="set-note">微信支付约 0.6%；走外卖平台请按平台实际抽成填写。</view>
+  </view>
+
+  <!-- 商品排行 -->
+  <view class="card">
+    <view class="card-h2">商品排行</view>
+    <view class="rank-bar">
+      <view class="rank-period">
+        <text class="rp {{rankPeriod==='month'?'on':''}}" data-period="month" bindtap="onRankPeriod">按月</text>
+        <text class="rp-sep">·</text>
+        <text class="rp {{rankPeriod==='year'?'on':''}}" data-period="year" bindtap="onRankPeriod">按年</text>
+      </view>
+      <view class="rank-metric">
+        <view class="rm {{rankDim==='qty'?'on':''}}" data-dim="qty" bindtap="onRankDim">销量</view>
+        <view class="rm {{rankDim==='profit'?'on':''}}" data-dim="profit" bindtap="onRankDim">赚钱</view>
+        <view class="rm {{rankDim==='margin'?'on':''}}" data-dim="margin" bindtap="onRankDim">毛利</view>
+      </view>
+    </view>
+    <view class="rank-sub" style="color:{{rankPeriodColor}}">{{rankPeriodLbl}}</view>
+    <view wx:for="{{rankList}}" wx:key="name" class="rank-row">
+      <text class="rk">{{index+1}}</text>
+      <view class="rbody">
+        <view class="rtop"><text class="rname">{{item.name}}</text><text class="rval">{{item.val}}</text></view>
+        <view class="rbar"><view class="rfill" style="width:{{item.width}}%;background:{{item.color}}"></view></view>
+      </view>
+    </view>
+    <view wx:if="{{rankMore}}" class="rank-more" bindtap="onRankMore">展开全部 {{rankCount}} 个商品 ▾</view>
+  </view>
+
+  <!-- 导出 -->
+  <view class="card">
+    <view class="add" bindtap="onExport">导出本月长图（可分享朋友圈/微信）</view>
+  </view>
+
+  <!-- 数据备份：数据只存在本机微信里，换手机/卸载重装/清存储都会清空。
+       所以必须给一条「导出到用户自己手里」的路，以及一条能导回来的路。 -->
+  <view class="card">
+    <view class="card-h2">数据备份</view>
+    <view class="set-hint">数据只保存在本机微信中，换手机、卸载重装或清理存储都会清空。建议导出备份发到「文件传输助手」长期保存。</view>
+    <view class="bk-stats">{{backupText}}</view>
+
+    <view class="add add-full" bindtap="onBackupExportFile">导出备份文件（发聊天保存）</view>
+    <view class="bk-sec" bindtap="onBackupExportText">复制备份文本（无文件权限时用）</view>
+
+    <view class="bk-divider"></view>
+
+    <view class="bk-sec" bindtap="onBackupImportFile">从聊天选择备份文件导入</view>
+    <view class="bk-sec" bindtap="onBackupImportText">粘贴文本导入</view>
+
+    <view wx:if="{{backupSnapExists}}" class="bk-undo" bindtap="onBackupUndo">撤销上次导入（回到 {{backupSnapAt}} 的数据）</view>
+
+    <view class="set-note">导入前会自动存一份快照，导入后可撤销；撤销本身也会再存快照。备份内容不会上传任何服务器。</view>
+  </view>
+</view>
+
+<!-- 离屏 canvas，用于导出长图 -->
+<canvas type="2d" id="exportCanvas" style="position:fixed;left:-9999px;top:0;width:750px;height:{{canvasH}}px"></canvas>

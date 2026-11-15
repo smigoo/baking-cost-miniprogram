@@ -1,0 +1,72 @@
+/* pages/monthly/monthly.wxss */
+/* 月份切换条：把 ‹月份› 与「回到今天」压成一行，取代原来 7 行日期格子（约 350px 首屏） */
+.month-nav { display: flex; align-items: center; gap: 12px; }
+.month-nav .cal-head { flex: 1; margin-bottom: 0; }
+
+.cov-tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 8px; margin-bottom: 8px; }
+
+/* ===== 固定支出：单行「名称 — 金额(元) — ✕」 =====
+   原实现把「金额(元)」做成 block 级 label 压在输入框上方，导致每行被撑成两行、
+   标签浮在输入框右上角且与 ✕ 挤在一起；输入框又被 flex 挤到中间。
+   改为：名称占满剩余宽度、金额定宽右对齐、单位做行内后缀、✕ 固定方形热区。 */
+.fix-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+.fix-row.sep { border-top: 1px solid var(--line); }
+
+.fix-name {
+  flex: 1; min-width: 0;
+  height: 34px; line-height: 34px; padding: 0;
+  border: none; background: transparent;
+  font-size: 14px; font-weight: 600; color: var(--brown);
+  outline: none;
+}
+.fix-name:focus { border-bottom: 1px solid var(--caramel); }
+
+.fix-amount { flex: 0 0 auto; display: flex; align-items: center; gap: 4px; }
+.fix-num {
+  width: 130rpx; height: 34px; line-height: 34px; box-sizing: border-box;
+  padding: 0 8rpx; text-align: right;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--surface); color: var(--brown);
+  font-size: 13px; outline: none;
+}
+.fix-num:focus { border-color: var(--caramel); }
+.fix-unit { font-size: 12px; color: var(--brown-2); }
+
+.fix-del {
+  flex: 0 0 auto; width: 30px; height: 30px; line-height: 30px; text-align: center;
+  font-size: 14px; color: var(--brown-2); opacity: .55; border-radius: 8px;
+}
+.fix-del:active { color: var(--brick); background: rgba(207,106,79,.12); opacity: 1; }
+
+/* ===== 定价参数卡 =====
+   复用固定支出的 .fix-amount / .fix-num / .fix-unit 控件规格，视觉上与上方同族；
+   只新增「label + 控件」的这一种行，不带删除按钮。 */
+.set-hint { font-size: 11.5px; color: var(--brown-2); line-height: 1.55; margin-bottom: 6px; }
+.set-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; }
+.set-row.sep { border-top: 1px solid var(--line); }
+.set-lbl { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; color: var(--brown); }
+.set-note { font-size: 11px; color: var(--brown-2); line-height: 1.55; padding: 0 0 6px; }
+.set-note:last-child { padding-bottom: 0; }
+
+/* ===== 数据备份卡 =====
+   主操作沿用全局 .add（实心焦糖）；次级操作用虚线描边，与商品页「+ 加原料」同一视觉语言，
+   保证「一个页面只有一个实心主按钮」的层级。 */
+.bk-stats {
+  font-size: 12.5px; color: var(--brown); font-weight: 600;
+  background: var(--cream); border-radius: 10px;
+  padding: 8px 10px; margin-bottom: 4px;
+}
+.bk-sec {
+  display: block; text-align: center;
+  border: 1px dashed var(--caramel); color: var(--caramel);
+  background: transparent; font-size: 13px; font-weight: 600;
+  padding: 8px 14px; border-radius: 999px; margin-top: 8px;
+}
+.bk-sec:active { background: rgba(222,138,78,.10); }
+.bk-divider { height: 1px; background: var(--line); margin: 12px 0 4px; }
+.bk-undo {
+  margin-top: 10px; text-align: center;
+  font-size: 12.5px; font-weight: 600; color: var(--brick);
+  background: rgba(207,106,79,.10); border-radius: 10px; padding: 9px 12px;
+}
+.bk-undo:active { background: rgba(207,106,79,.18); }
