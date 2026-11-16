@@ -7,7 +7,9 @@
 ```
 baking-cost-miniprogram/
 ├── app.js / app.json / app.wxss      # 应用入口、页面与 tabBar 注册、全局样式与 CSS 变量
-├── project.config.json               # 微信开发者工具工程配置（appid=游客模式，可直接预览）
+├── project.config.json               # 微信开发者工具工程配置（公共配置，不含 appid）
+├── project.config.sample.json        # 克隆后复制为 project.config.json 并填入自己的 appid
+├── project.private.config.json       # 本地私有配置（含个人 appid，已 .gitignore，不入库）
 ├── sitemap.json
 ├── utils/store.js                    # 数据层：状态 / 持久化 / 单位换算 / 成本计算 / 各页 mutator
 ├── utils/recipe-book.js              # 配方手册纯计算层：按商品拆行小计+占比、按原料反查（不读写存储）
@@ -25,7 +27,9 @@ baking-cost-miniprogram/
 ## 如何运行
 
 1. 用**微信开发者工具** → 导入项目 → 选择本目录 `baking-cost-miniprogram`。
-2. AppID：`project.config.json` 已配置为 `wx275e8d0d19f2d215`，也可改用测试号。
+2. AppID：仓库不携带任何 appid（`project.config.json` 为公共配置，不含 appid）。克隆后有两种方式：
+   - **用自己的号**：把 `project.config.sample.json` 复制为 `project.config.json`，填入自己的 appid；或直接在开发者工具「详情 → 基本信息」里选号（会写入本地 `project.private.config.json`）。
+   - **只想先看效果**：在开发者工具里选「测试号」，无需真实 appid。
 3. 编译后即看到 4 个底部 Tab：记销量 / 原料 / 商品 / 经营报表（经营报表在最后，符合"先做后看"节奏）。
 4. 无 npm 依赖、无后端、无云开发，零部署。
 
