@@ -1,7 +1,15 @@
 <!-- pages/material/material.wxml -->
 <view class="screen">
   <view class="title">原料</view>
-  <view class="sub">填写进价与重量，可切换质量/体积单位（克·千克·斤·两·磅·盎司 / 毫升·升·茶匙·汤匙·量杯），自动换算成克并算每克单价；体积换算为近似估算并标注</view>
+  <view class="sub">填写进价与重量/数量，可切换质量·体积·计件单位（常用单位已排在前面）。质量体积换算成克算每克单价（体积为近似估算）；计件单位（个/根/份）按每个单位直接计价，不折克重</view>
+
+  <!-- 原料名称模糊搜索：原料多时快速定位，不改动任何输入源字段 -->
+  <view class="search-bar">
+    <text class="sb-icon">⌕</text>
+    <input class="sb-input" value="{{keyword}}" bindinput="onSearch" placeholder="搜索原料名称" confirm-type="search"/>
+    <view wx:if="{{keyword}}" class="sb-clear" bindtap="onClearSearch">✕</view>
+  </view>
+
   <view class="card">
     <view wx:for="{{materials}}" wx:key="id" class="mrow">
       <view class="mrow-top">
@@ -14,7 +22,7 @@
           <input class="minput" type="digit" value="{{item.price}}" data-id="{{item.id}}" data-k="price" bindinput="onInput"/>
         </view>
         <view class="mfield">
-          <text class="mlbl">重量</text>
+          <text class="mlbl">{{item.isCount ? item.classifier + '数' : '重量'}}</text>
           <input class="minput" type="digit" value="{{item.amount}}" data-id="{{item.id}}" data-k="amount" bindinput="onInput"/>
         </view>
         <picker class="mfield" range="{{item.unitOpts}}" range-key="label" value="{{item.unitIdx||0}}" data-id="{{item.id}}" bindchange="onUnitChange">
@@ -23,12 +31,18 @@
         </picker>
       </view>
       <view class="mrow-calc">
-        <view class="calc-line"><text class="ckey">重量换算</text><text class="cval">{{item.amount}}{{item.unitLabel}} → {{item.gramsText}} g</text></view>
-        <view class="calc-line"><text class="ckey">每克单价</text><text class="cval">{{item.unitPriceText}}</text></view>
+        <view class="calc-line" wx:if="{{!item.isCount}}"><text class="ckey">重量换算</text><text class="cval">{{item.amount}}{{item.unitLabel}} → {{item.gramsText}} g</text></view>
+        <view class="calc-line" wx:if="{{item.isCount}}"><text class="ckey">计价方式</text><text class="cval">按{{item.classifier}}计价 · 不折算克重</text></view>
+        <view class="calc-line"><text class="ckey">{{item.isCount ? '每' + item.classifier + '单价' : '每克单价'}}</text><text class="cval">{{item.unitPriceText}}</text></view>
         <view wx:if="{{item.unitNote}}" class="calc-note">{{item.unitNote}}</view>
       </view>
     </view>
-    <view wx:if="{{materials.length===0}}" class="mat-empty">
+    <view wx:if="{{materials.length===0 && keyword}}" class="mat-empty">
+      <view class="me-mark"></view>
+      <view class="me-title">没找到「{{keyword}}」</view>
+      <view class="me-sub">换个关键词，或点上方 ✕ 清除搜索</view>
+    </view>
+    <view wx:if="{{materials.length===0 && !keyword}}" class="mat-empty">
       <view class="me-mark"></view>
       <view class="me-title">原料库是空的</view>
       <view class="me-sub">商品的配方只能从这里选原料。先点下方「+ 添加原料」，填好进价与重量，再回商品页配配方</view>
@@ -36,3 +50,6 @@
     <view class="add add-full" bindtap="onAdd">+ 添加原料</view>
   </view>
 </view>
+
+<!-- 一键到顶/到底浮窗 -->
+<scroll-fab></scroll-fab>

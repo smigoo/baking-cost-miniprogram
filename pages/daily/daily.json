@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "记销量",
-  "usingComponents": {}
+  "usingComponents": {
+    "scroll-fab": "../../components/scroll-fab/scroll-fab"
+  }
 }

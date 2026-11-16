@@ -125,20 +125,26 @@
    语义：这条不是「另一个成本数字」，而是「你现在填的售价能不能卖」的判词。
    四态四色：健康=橄榄绿 / 偏低=蜂蜜黄 / 低于保本=砖红 / 未知=灰。 */
 .pricing-bar {
-  display: flex; align-items: center; gap: 8px;
+  display: flex; flex-direction: column; gap: 5px;
   margin-top: 10px; padding: 8px 10px;
   border-radius: 10px; background: var(--cream);
   border-left: 3px solid var(--brown-2);
 }
+/* 主行：状态徽标 + 售价（醒目、绝不省略）+ 明细入口，折叠态也一眼可见 */
+.pb-main { display: flex; align-items: center; gap: 8px; }
 .pb-tag {
   flex: 0 0 auto; font-size: 11px; font-weight: 700;
   padding: 2px 7px; border-radius: 6px;
   color: #fff; background: var(--brown-2);
   white-space: nowrap;
 }
+.pb-price { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 4px; white-space: nowrap; }
+.pb-price-lbl { font-size: 11px; color: var(--brown-2); }
+.pb-price-num { font-size: 15px; font-weight: 700; color: var(--brown); }
+/* 副行：判词含建议价，允许换行，不再用省略号截掉末尾的价格数字 */
 .pb-text {
-  flex: 1; min-width: 0; font-size: 12px; color: var(--brown);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: 12px; color: var(--brown);
+  line-height: 1.45; white-space: normal;
 }
 .pb-more { flex: 0 0 auto; font-size: 12px; color: var(--brown-2); }
 

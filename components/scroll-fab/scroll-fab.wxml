@@ -1,0 +1,18 @@
+<!-- 滚动浮窗：一键到顶/到底 + 长按拖动。position:fixed 相对视口，位置由 js 计算（支持拖动+持久化） -->
+<view
+  class="sf-wrap {{dragging ? 'sf-dragging' : ''}}"
+  style="left:{{x}}px; top:{{y}}px; opacity:{{opacity}}"
+  bindtouchstart="onTouchStart"
+  catchtouchmove="onTouchMove"
+  bindtouchend="onTouchEnd"
+  bindtouchcancel="onTouchEnd"
+>
+  <view class="sf-btn" bindtap="toTop" hover-class="sf-hover" aria-label="回到顶部">
+    <view class="sf-ico">↑</view>
+    <view class="sf-txt">顶部</view>
+  </view>
+  <view class="sf-btn" bindtap="toBottom" hover-class="sf-hover" aria-label="跳到底部">
+    <view class="sf-ico">↓</view>
+    <view class="sf-txt">底部</view>
+  </view>
+</view>

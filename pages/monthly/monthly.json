@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "经营报表",
-  "usingComponents": {}
+  "usingComponents": {
+    "scroll-fab": "../../components/scroll-fab/scroll-fab"
+  }
 }

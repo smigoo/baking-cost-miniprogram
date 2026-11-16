@@ -38,5 +38,6 @@
   "projectname": "baking-cost-miniprogram",
   "condition": {},
   "simulatorPluginLibVersion": {},
-  "editorSetting": {}
+  "editorSetting": {},
+  "isGameTourist": false
 }

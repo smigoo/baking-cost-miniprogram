@@ -69,3 +69,6 @@
   </view>
 
 </view>
+
+<!-- 一键到顶/到底浮窗 -->
+<scroll-fab></scroll-fab>

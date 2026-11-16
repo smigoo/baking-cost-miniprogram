@@ -180,3 +180,6 @@
 
 <!-- 离屏 canvas，用于导出长图 -->
 <canvas type="2d" id="exportCanvas" style="position:fixed;left:-9999px;top:0;width:750px;height:{{canvasH}}px"></canvas>
+
+<!-- 一键到顶/到底浮窗 -->
+<scroll-fab></scroll-fab>

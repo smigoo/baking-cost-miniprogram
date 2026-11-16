@@ -180,3 +180,21 @@ page {
 /* 按钮禁用态（如 picker 无可选项时） */
 .add-disabled { background: var(--line); color: var(--brown-2); }
 .add-disabled:active { background: var(--line); }
+
+/* ===== 列表模糊搜索框（原料页 / 商品页共用）=====
+   胶囊形轻描边，视觉上弱于「+ 添加」主按钮，避免抢主操作层级。 */
+.search-bar {
+  display: flex; align-items: center; gap: 6px;
+  height: 38px; box-sizing: border-box;
+  padding: 0 10px; margin: 2px 0 12px;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: var(--card);
+}
+.sb-icon { flex: 0 0 auto; font-size: 18px; color: var(--brown-2); line-height: 1; }
+.sb-input { flex: 1; min-width: 0; height: 36px; line-height: 36px; font-size: 13px; color: var(--brown); outline: none; }
+.sb-clear {
+  flex: 0 0 auto; width: 22px; height: 22px; line-height: 22px; text-align: center;
+  font-size: 12px; color: var(--brown-2); background: var(--cream);
+  border-radius: 50%;
+}
+.sb-clear:active { color: var(--brick); }

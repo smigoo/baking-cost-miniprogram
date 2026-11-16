@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "原料",
-  "usingComponents": {}
+  "usingComponents": {
+    "scroll-fab": "../../components/scroll-fab/scroll-fab"
+  }
 }

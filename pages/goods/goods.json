@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "商品",
-  "usingComponents": {}
+  "usingComponents": {
+    "scroll-fab": "../../components/scroll-fab/scroll-fab"
+  }
 }

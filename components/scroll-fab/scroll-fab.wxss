@@ -1,0 +1,32 @@
+/* 滚动浮窗：竖排两枚圆按钮。位置(left/top)与透明度由组件内联 style 动态控制，支持长按拖动 */
+.sf-wrap {
+  position: fixed;
+  /* left/top 由 js 内联注入；不再写死 right/bottom */
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: opacity 0.18s ease;
+  touch-action: none; /* 拖拽时不触发页面滚动/手势 */
+}
+.sf-btn {
+  width: 48px;
+  height: 48px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 3px 12px rgba(74, 59, 46, 0.16);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.sf-hover { background: var(--cream); }
+/* 拖拽态：加深阴影 + 轻微放大，给出明确的可移动反馈 */
+.sf-dragging .sf-btn {
+  box-shadow: 0 6px 20px rgba(74, 59, 46, 0.32);
+  transform: scale(1.06);
+}
+.sf-ico { font-size: 20px; line-height: 20px; font-weight: 700; color: var(--caramel); }
+.sf-txt { font-size: 10px; line-height: 14px; color: var(--brown-2); }

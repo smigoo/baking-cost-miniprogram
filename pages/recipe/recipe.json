@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "配方手册",
-  "usingComponents": {}
+  "usingComponents": {
+    "scroll-fab": "../../components/scroll-fab/scroll-fab"
+  }
 }

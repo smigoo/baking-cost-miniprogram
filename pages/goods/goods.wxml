@@ -3,6 +3,13 @@
   <view class="title">商品</view>
   <view class="sub">点 ▾ 折叠/展开；设售价、损耗，再选原料+用量混合。切换原料时用量单位会自动同步为该原料的采购单位</view>
 
+  <!-- 商品名称模糊搜索：商品多了快速定位，不改动任何输入源字段 -->
+  <view class="search-bar">
+    <text class="sb-icon">⌕</text>
+    <input class="sb-input" value="{{keyword}}" bindinput="onSearch" placeholder="搜索商品名称" confirm-type="search"/>
+    <view wx:if="{{keyword}}" class="sb-clear" bindtap="onClearSearch">✕</view>
+  </view>
+
   <!-- 配方手册入口：商品多了以后逐张卡展开看配方太低效，
        手册按「每行花多少钱」排序并支持按原料反查，此处只做跳转 -->
   <view class="rb-entry" bindtap="onOpenRecipeBook">
@@ -23,9 +30,12 @@
     <!-- 定价健康提示：常驻卡头下方（卡片折叠时也可见），让用户一眼看出「这个价能不能卖」。
          点它展开定价明细，卡片若处于折叠态会自动展开。 -->
     <view class="pricing-bar {{g.pricing.status}}" data-gid="{{g.id}}" data-gi="{{gi}}" bindtap="onTogglePricing">
-      <view class="pb-tag">{{g.pricingTag}}</view>
+      <view class="pb-main">
+        <view class="pb-tag">{{g.pricingTag}}</view>
+        <view class="pb-price"><text class="pb-price-lbl">售价</text><text class="pb-price-num">¥{{g.priceText}}</text></view>
+        <view class="pb-more">{{g.pricingOpen ? '收起' : '明细'}} ▾</view>
+      </view>
       <view class="pb-text">{{g.pricing.statusText}}</view>
-      <view class="pb-more">{{g.pricingOpen ? '收起' : '明细'}} ▾</view>
     </view>
 
     <view class="good-body">
@@ -138,7 +148,12 @@
     </view>
   </view>
 
-  <view wx:if="{{goods.length===0}}" class="goods-empty">
+  <view wx:if="{{goods.length===0 && keyword}}" class="goods-empty">
+    <view class="ge-mark"></view>
+    <view class="ge-title">没找到「{{keyword}}」</view>
+    <view class="ge-sub">换个关键词，或点上方 ✕ 清除搜索</view>
+  </view>
+  <view wx:if="{{goods.length===0 && !keyword}}" class="goods-empty">
     <view class="ge-mark"></view>
     <view class="ge-title">还没有商品</view>
     <view class="ge-sub">点下方按钮添加第一个商品，设好售价并选原料即可自动核算成本与毛利</view>
@@ -146,3 +161,6 @@
 
   <view class="add add-good" bindtap="onAddGood">+ 添加商品</view>
 </view>
+
+<!-- 一键到顶/到底浮窗 -->
+<scroll-fab></scroll-fab>

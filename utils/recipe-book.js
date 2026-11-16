@@ -129,18 +129,26 @@ function byMaterial(st) {
     });
     uses.sort((a, b) => b.sub - a.sub || a.ui - b.ui);
 
+    // 计件原料单价内部是「元/件」，不折 kg；质量/体积原料是「元/克」，折成「元/kg」便于横向比较
+    const isCount = !!m.isCount;
+    // 计件量词（个/根/份）：优先取状态派生字段，兼容手工构造的对象按单位映射兜底
+    const CN = { ge: '个', gen: '根', fen: '份' };
+    const classifier = m.classifier || CN[m.unit] || '个';
+    // 件数按整数显示（2 根不该显示成 2.00 根）；克重沿用 gramText 的小数口径
+    const totalText = isCount ? String(Math.round(gramTotal)) : gramText(gramTotal);
     return {
       id: m.id,
       name: m.name || '未命名原料',
-      // 单价统一折成「元/kg」便于横向比较（原料单价内部是元/克，直接显示小数位太多）
-      pricePerKgText: money2((+m.unitPrice || 0) * 1000),
+      // 计件显示「元/量词」，其余显示「元/kg」（字段名保留以兼容既有校验）
+      pricePerKgText: money2(isCount ? (+m.unitPrice || 0) : (+m.unitPrice || 0) * 1000),
+      priceUnit: isCount ? '/' + classifier : '/kg',
       useCount: uses.length,
       uses,
-      gramText: gramText(gramTotal),
+      gramText: totalText,
       subTotal,
       subTotalText: money2(subTotal),
       metaText: uses.length > 0
-        ? '被 ' + uses.length + ' 个商品使用 · 在这 ' + uses.length + ' 个商品里共花 ¥' + money2(subTotal) + ' · 合计 ' + gramText(gramTotal) + 'g'
+        ? '被 ' + uses.length + ' 个商品使用 · 在这 ' + uses.length + ' 个商品里共花 ¥' + money2(subTotal) + ' · 合计 ' + totalText + (isCount ? classifier : 'g')
         : '暂无商品使用'
     };
   });

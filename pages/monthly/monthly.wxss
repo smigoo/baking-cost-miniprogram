@@ -1,4 +1,19 @@
 /* pages/monthly/monthly.wxss */
+/* ===== 毛利率健康环形图 =====
+   这套样式原先只在 daily.wxss 定义（日报导出用），日报导出删除后成了死代码；
+   但月报页「商品毛利率健康」也用了 .ring/.ring-inner，因 wxss 页面隔离拿不到样式，
+   导致环失去宽高/定位被压成横条、中间文字叠在渐变上。此处补齐，让环正常渲染。 */
+.ring {
+  width: 110px; height: 110px; border-radius: 50%;
+  position: relative; flex-shrink: 0;
+}
+.ring-inner {
+  position: absolute; inset: 14px; background: var(--surface); border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.ring-inner .big { font-size: 16px; font-weight: 700; }
+.ring-inner .lbl { font-size: 10px; color: var(--brown-2); }
+
 /* 月份切换条：把 ‹月份› 与「回到今天」压成一行，取代原来 7 行日期格子（约 350px 首屏） */
 .month-nav { display: flex; align-items: center; gap: 12px; }
 .month-nav .cal-head { flex: 1; margin-bottom: 0; }

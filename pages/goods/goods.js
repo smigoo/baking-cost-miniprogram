@@ -5,7 +5,7 @@ const store = require('../../utils/store.js');
 const PRICING_TAG = { ok: '定价健康', low: '定价偏低', loss: '低于保本', unset: '未定价', unknown: '待补全' };
 
 Page({
-  data: { goods: [] },
+  data: { goods: [], keyword: '' },
 
   onShow() {
     // 每次切到商品页都收敛一次历史空壳（不依赖「重新编译」，切 tab 即生效）。
@@ -14,6 +14,11 @@ Page({
     this.refresh();
     if (removed > 0) wx.showToast({ title: '已收起 ' + removed + ' 个空白商品', icon: 'none', duration: 1500 });
     const gid = store.getPendingFocus();
+    if (gid && this.data.keyword) {
+      // 从配方手册跳回来定位某商品，但当前有搜索词可能把它过滤掉 → 先清搜索再定位
+      this.setData({ keyword: '' });
+      this.refresh();
+    }
     if (gid && this.data.goods.some(g => g.id === gid)) {
       const goods = this.data.goods.map(x => ({ ...x, collapsed: x.id !== gid }));
       this.setData({ goods });
@@ -66,6 +71,9 @@ Page({
       ...g, collapsed, pricingOpen: !!pricingOpen,
       pricing: this.pricingSafe(g.pricing),
       pricingTag: PRICING_TAG[(g.pricing && g.pricing.status) || 'unknown'] || '待补全',
+      // 折叠态也要看到「实际售价」：售价输入框在 good-body 里，折叠后隐藏，
+      // 故在主卡头下方常驻这条定价提示里补一个售价数字（两位小数，与建议价口径一致）。
+      priceText: Number(g.price || 0).toFixed(2),
       costText: store.fmt(g.cost),
       profitText: store.fmt(g.profit),
       marginText: (g.margin * 100).toFixed(1),
@@ -79,7 +87,11 @@ Page({
     const prev = this.data.goods;
     // 只渲染带合法 id 的商品：杜绝「无 id 的幽灵卡」——这类卡片 data-gid 为空，
     // 表现为一张空白卡且点删除永远提示「未识别到商品」。
-    const list = st.goods.filter(g => g && g.id !== undefined && g.id !== null && g.id !== '');
+    const all = st.goods.filter(g => g && g.id !== undefined && g.id !== null && g.id !== '');
+    // 名称模糊搜索（忽略大小写/首尾空格）。基于全量 all 过滤，不能用 this.data.goods
+    // （那是上次过滤结果，会越搜越少）。prev 仍按 id 匹配折叠态，过滤不影响状态保留。
+    const q = String(this.data.keyword || '').trim().toLowerCase();
+    const list = q ? all.filter(g => String(g.name || '').toLowerCase().indexOf(q) >= 0) : all;
     this.setData({
       goods: list.map(g => {
         const p = prev.find(x => x.id === g.id);
@@ -88,6 +100,18 @@ Page({
         return this.decorate(g, collapsed, p ? p.pricingOpen : false);
       })
     });
+  },
+
+  // 搜索框输入：keyword 是独立搜索态，不是商品字段，整体 setData 列表不会打断
+  // 商品名/售价等输入框的光标（那些走 patchDerived，红线见 check-input-binding）。
+  onSearch(e) {
+    this.setData({ keyword: e.detail.value || '' });
+    this.refresh();
+  },
+
+  onClearSearch() {
+    this.setData({ keyword: '' });
+    this.refresh();
   },
 
   // 局部同步某商品卡片（保留 collapsed，更新派生计算值）。
@@ -141,7 +165,8 @@ Page({
       [base + '.marginText']: d.marginText,
       [base + '.marginColor']: d.marginColor,
       [base + '.pricing']: d.pricing,
-      [base + '.pricingTag']: d.pricingTag
+      [base + '.pricingTag']: d.pricingTag,
+      [base + '.priceText']: d.priceText
     });
   },
 
@@ -309,6 +334,8 @@ Page({
   },
 
   onAddGood() {
+    // 搜索态下新增的商品名默认为空，会被搜索过滤掉导致「点了没反应」→ 先清搜索
+    if (this.data.keyword) this.setData({ keyword: '' });
     const before = this.data.goods.map(x => x.id);
     const gid = store.addGood();
     if (!gid) { wx.showToast({ title: '添加失败，请重试', icon: 'none', duration: 1500 }); return; }

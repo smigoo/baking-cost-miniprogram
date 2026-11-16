@@ -69,7 +69,7 @@
       <view class="card rb" wx:for="{{byMat}}" wx:for-item="m" wx:for-index="mi" wx:key="id">
         <view class="rb-top">
           <view class="rb-name">{{m.name}}</view>
-          <view class="mb-price">¥{{m.pricePerKgText}}/kg</view>
+          <view class="mb-price">¥{{m.pricePerKgText}}{{m.priceUnit || '/kg'}}</view>
         </view>
         <view class="rb-meta {{m.useCount ? '' : 'dim'}}">{{m.metaText}}</view>
 
@@ -86,3 +86,6 @@
 
   <view class="foot-note">数据与「商品」「原料」页实时一致 · 修改仍需回对应页面</view>
 </view>
+
+<!-- 一键到顶/到底浮窗 -->
+<scroll-fab></scroll-fab>

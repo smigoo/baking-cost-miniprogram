@@ -12,24 +12,46 @@ const UNIT_FACTOR = {
   // 质量（精确）
   g: 1, kg: 1000, jin: 500, liang: 50, lb: 453.59237, oz: 28.3495231, '500g': 500,
   // 体积（估算，1ml≈1g）
-  ml: 1, L: 1000, tsp: 5, tbsp: 15, cup: 240
+  ml: 1, L: 1000, tsp: 5, tbsp: 15, cup: 240,
+  // 计件（按件计价，不折克）：鸡蛋「个」、烤肠「根」、成品「份」等。系数固定为 1，
+  // 采购与用量都用同一计件单位时系数在单价/成本公式中约掉，直接按「元/单位 × 数量」结算。
+  // 注意：计件不与质量/体积混算（买按斤、用按个会失真），采购和用量必须同用同一计件单位。
+  ge: 1, gen: 1, fen: 1
 };
 const UNIT_LABEL = {
   g: '克(g)', kg: '千克(kg)', jin: '斤', liang: '两', lb: '磅(lb)', oz: '盎司(oz)', '500g': '500g',
-  ml: '毫升(ml)', L: '升(L)', tsp: '茶匙(tsp)', tbsp: '汤匙(tbsp)', cup: '量杯(cup)'
+  ml: '毫升(ml)', L: '升(L)', tsp: '茶匙(tsp)', tbsp: '汤匙(tbsp)', cup: '量杯(cup)',
+  ge: '个', gen: '根', fen: '份'
 };
 // 体积单位：克重为估算，各自给出换算口径供核对
 const UNIT_IS_VOLUME = { ml: true, L: true, tsp: true, tbsp: true, cup: true };
+// 计件单位：按件直接计价，不折算克重；与质量/体积维度平行且不可混算
+const UNIT_IS_COUNT = { ge: true, gen: true, fen: true };
+function isCountUnit(u) { return !!UNIT_IS_COUNT[u]; }
+// 计件量词：给页面/手册显示用（个/根/份）；非计件返回空串
+const UNIT_CLASSIFIER = { ge: '个', gen: '根', fen: '份' };
+function countLabel(u) { return UNIT_CLASSIFIER[u] || ''; }
 const UNIT_VOLUME_HINT = {
   ml: '1ml≈1g', L: '1L=1000ml≈1000g', tsp: '1茶匙≈5ml≈5g',
   tbsp: '1汤匙≈15ml≈15g', cup: '1量杯≈240ml≈240g（美制）'
 };
+// 展示顺序：按烘焙记账的使用频率排，常用在前、冷门在后；与换算字典顺序解耦。
+// 高频：克、千克、个、毫升；计件扩展(根/份)紧随其后；再后为斤/两/升/500g 与西式小众(茶匙/汤匙/量杯/磅/盎司)。
+const UNIT_ORDER = ['g', 'kg', 'ge', 'ml', 'gen', 'fen', 'jin', 'liang', 'L', '500g', 'tsp', 'tbsp', 'cup', 'lb', 'oz'];
+// 防御：换算表新增单位却忘记登记展示顺序时自动补到末尾，避免该单位在下拉里彻底消失
+const UNIT_KEYS = UNIT_ORDER.concat(Object.keys(UNIT_FACTOR).filter(u => UNIT_ORDER.indexOf(u) < 0));
 function unitOpts(sel) {
-  return Object.keys(UNIT_FACTOR).map(u => ({ value: u, label: UNIT_LABEL[u], selected: u === sel }));
+  return UNIT_KEYS.map(u => ({ value: u, label: UNIT_LABEL[u], selected: u === sel }));
 }
-// picker 用索引定位，需返回当前单位在下拉中的位置，否则每次打开跳回第一项
-function unitIndex(unit) { const i = Object.keys(UNIT_FACTOR).indexOf(unit); return i < 0 ? 0 : i; }
+// picker 用索引定位，需返回当前单位在下拉中的位置，否则每次打开跳回第一项。
+// 必须与 unitOpts 共用同一份顺序，否则选中项会错位。
+function unitIndex(unit) { const i = UNIT_KEYS.indexOf(unit); return i < 0 ? 0 : i; }
+// 口径提示：计件单位按「元/量词 × 数量」直接计价，不折算克重
 function volumeNote(unit) {
+  if (isCountUnit(unit)) {
+    const c = countLabel(unit);
+    return '按「元/' + c + ' × 数量」直接计价，不折算克重；请只用「' + c + '」买、也只用「' + c + '」用，不要和质量/体积单位混算';
+  }
   if (!UNIT_IS_VOLUME[unit]) return '';
   return '按 ' + (UNIT_VOLUME_HINT[unit] || '1ml≈1g') + ' 估算；油/糖浆/粉类密度不同，实际克重会有偏差';
 }
@@ -456,7 +478,7 @@ function seed() {
 function getState() {
   const matOptions = materials.map(m => ({ value: m.id, label: m.name }));
   return {
-    materials: materials.map(m => { const cm = calcMaterial(m); return { ...m, ...cm, unitOpts: unitOpts(m.unit), unitIdx: unitIndex(m.unit), unitLabel: UNIT_LABEL[m.unit], unitPriceText: '¥' + cm.unitPrice.toFixed(3), gramsText: fmtGram(cm.grams), unitNote: volumeNote(m.unit) }; }),
+    materials: materials.map(m => { const cm = calcMaterial(m); const isCount = isCountUnit(m.unit); return { ...m, ...cm, isCount, classifier: countLabel(m.unit), unitOpts: unitOpts(m.unit), unitIdx: unitIndex(m.unit), unitLabel: UNIT_LABEL[m.unit], unitPriceText: '¥' + cm.unitPrice.toFixed(isCount ? 2 : 3), gramsText: fmtGram(cm.grams), unitNote: volumeNote(m.unit) }; }),
     goods: goods.map(g => ({
       ...g, ...calcGood(g),
       // 老存档没有这两个字段，统一补 0，避免页面输入框显示 undefined
@@ -885,7 +907,7 @@ function setPendingFocus(gid) { pendingFocusGid = gid; }
 function getPendingFocus() { const g = pendingFocusGid; pendingFocusGid = null; return g; }
 
 module.exports = {
-  UNIT_FACTOR, UNIT_LABEL, UNIT_IS_VOLUME, UNIT_VOLUME_HINT, unitOpts, unitIndex, volumeNote,
+  UNIT_FACTOR, UNIT_LABEL, UNIT_ORDER, UNIT_IS_VOLUME, UNIT_IS_COUNT, isCountUnit, UNIT_CLASSIFIER, countLabel, UNIT_VOLUME_HINT, unitOpts, unitIndex, volumeNote,
   init, save, getState, pruneBlankGoods, reloadFromStorage, ensureUniqueIds,
   pad2, ymd, todayStr, shiftMonth, shiftByDay, monthCells, fmtDate, fmt,
   calcMaterial, calcGood, calcPricing, daySummary, monthAgg, yearAgg,

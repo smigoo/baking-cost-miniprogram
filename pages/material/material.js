@@ -2,11 +2,32 @@
 const store = require('../../utils/store.js');
 
 Page({
-  data: { materials: [] },
+  data: { materials: [], keyword: '', searching: false },
 
   onShow() { this.refresh(); },
 
-  refresh() { this.setData({ materials: store.getState().materials }); },
+  // 名称模糊搜索：忽略大小写、忽略首尾空格。只匹配名称（原料没有更合适的检索维度）。
+  // 注意用「全量数据」过滤，不能用当前渲染的 this.data.materials（那已是上次过滤结果，会越搜越少）。
+  matchMaterials(kw) {
+    const all = store.getState().materials || [];
+    const q = String(kw || '').trim().toLowerCase();
+    return q ? all.filter(m => String(m.name || '').toLowerCase().indexOf(q) >= 0) : all;
+  },
+
+  refresh() {
+    this.setData({ materials: this.matchMaterials(this.data.keyword) });
+  },
+
+  // 搜索框输入：keyword 是独立的搜索态，不属于原料字段，整体 setData 列表不会打断
+  // 原料名称/价格输入框的光标（那些走 patchDerived，红线见 check-input-binding）。
+  onSearch(e) {
+    const kw = e.detail.value || '';
+    this.setData({ keyword: kw, materials: this.matchMaterials(kw) });
+  },
+
+  onClearSearch() {
+    this.setData({ keyword: '', materials: this.matchMaterials('') });
+  },
 
   onInput(e) {
     const id = e.currentTarget.dataset.id, k = e.currentTarget.dataset.k;
@@ -35,7 +56,9 @@ Page({
       [base + '.unitPrice']: nm.unitPrice,
       [base + '.unitPriceText']: nm.unitPriceText,
       [base + '.gramsText']: nm.gramsText,
-      [base + '.unitNote']: nm.unitNote
+      [base + '.unitNote']: nm.unitNote,
+      [base + '.isCount']: nm.isCount,
+      [base + '.classifier']: nm.classifier
     });
   },
 
